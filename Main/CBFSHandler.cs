@@ -31,10 +31,11 @@ namespace Main
         {
             _cbFs = new CallbackFileSystem
             {
-                OnMount = CbFsMount,
-                OnUnmount = CbFsUnmount,
+                OnMount = _ => { },
+                OnUnmount = _ => { },
                 OnGetVolumeSize = CbFsGetVolumeSize,
                 OnGetVolumeLabel = CbFsGetVolumeLabel,
+                OnSetVolumeLabel = (_, __) => { },
                 OnGetVolumeId = CbFsGetVolumeId,
                 OnCreateFile = CbFsCreateFile,
                 OnOpenFile = CbFsOpenFile,
@@ -42,6 +43,7 @@ namespace Main
                 OnGetFileInfo = CbFsGetFileInfo,
                 OnEnumerateDirectory = CbFsEnumerateDirectory,
                 OnCloseDirectoryEnumeration = CbFsCloseDirectoryEnumeration,
+                OnSetAllocationSize = (_, __, ___) => { },
                 OnCloseNamedStreamsEnumeration = CbFsCloseNamedStreamsEnumeration,
                 OnSetEndOfFile = CbFsSetEndOfFile,
                 OnSetFileAttributes = CbFsSetFileAttributes,
@@ -50,7 +52,8 @@ namespace Main
                 OnRenameOrMoveFile = CbFsRenameOrMoveFile,
                 OnReadFile = CbFsReadFile,
                 OnWriteFile = CbFsWriteFile,
-                OnIsDirectoryEmpty = CbFsIsDirectoryEmpty
+                OnIsDirectoryEmpty = CbFsIsDirectoryEmpty,
+                OnStorageEjected = _ => { }
             };
         }
 
@@ -70,18 +73,6 @@ namespace Main
             {
                 Console.WriteLine(err.Message);
             }
-
-            _cbFs.MetaDataCacheEnabled = false;
-            _cbFs.FileCacheEnabled = false;
-        }
-
-        private void CbFsMount(object sender)
-        {
-        }
-
-        private void CbFsUnmount(object sender)
-        {
-
         }
 
         private string FindAvailableDriveLetter()
@@ -217,7 +208,7 @@ namespace Main
             {
                 var fileStreamContext = fileInfo.UserContext.To<FileStreamContext>();
 
-                if (fileStreamContext.Stream.SafeFileHandle.IsInvalid)
+                if (fileStreamContext.Stream?.SafeFileHandle?.IsInvalid ?? false)
                 {
                     throw new IOException("Could not open file stream.", new Win32Exception());
                 }
@@ -273,7 +264,7 @@ namespace Main
             
             fileStreamContext = new FileStreamContext();
 
-            if (FileSystem.Virtual.IsDirectory(fileAttributes))
+            if (!FileSystem.Virtual.IsDirectory(fileAttributes))
             {
                 var fullFileName = FileSystem.Real.GetFileName(fileName);
                 fileStreamContext.Stream = new FileStream(fullFileName, FileMode.Open, FileAccess.ReadWrite,

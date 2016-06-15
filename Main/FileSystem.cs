@@ -26,7 +26,7 @@ namespace Main
 
             public static string GetFileName(string fileName)
             {
-                return Root + fileName;
+                return fileName == "\\" ? Root : Root + fileName;
             }
 
             public static bool IsDirectory(FileAttributes fileAttributes)
