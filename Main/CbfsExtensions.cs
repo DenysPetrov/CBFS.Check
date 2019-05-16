@@ -7,6 +7,7 @@ namespace Main
     {
         public static void DeallocateUserContext(this CbFsFileInfo sender)
         {
+        // dsfsf
             sender.UserContext.Deallocate();
             sender.UserContext = IntPtr.Zero;
         }
