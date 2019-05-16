@@ -8,7 +8,7 @@ namespace Main
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("***App to check how CBFS works***");
+            Console.WriteLine("***App to check how CBFS doesn't work***");
 
             Run();
             Console.ReadLine();
